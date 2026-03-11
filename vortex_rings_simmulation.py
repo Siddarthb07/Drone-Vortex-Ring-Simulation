@@ -13,7 +13,7 @@ G = 9.81              # m/s^2 (for Reynolds scale)
 
 
 # --------------------------------------------
-# Thrust profiles (same stories)
+# Thrust profiles
 # --------------------------------------------
 
 def thrust_profile(t, mode, T_max):
@@ -464,3 +464,4 @@ class DroneVortexApp:
 if __name__ == "__main__":
     app = DroneVortexApp()
     plt.show()
+
