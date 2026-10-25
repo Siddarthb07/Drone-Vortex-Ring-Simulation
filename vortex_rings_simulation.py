@@ -6,94 +6,15 @@ from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 import csv
 import os
 
-# Physical constants (SI)
-RHO_AIR = 1.225       # kg/m^3
-NU_AIR = 1.5e-5       # m^2/s  (base; slider scales this)
-G = 9.81              # m/s^2 (for Reynolds scale)
+from vortex_physics import (
+    RHO_AIR,
+    NU_AIR,
+    thrust_profile,
+    thrust_to_circulation,
+    VortexRingSimple,
+)
 
-
-# --------------------------------------------
-# Thrust profiles
-# --------------------------------------------
-
-def thrust_profile(t, mode, T_max):
-    """Thrust T(t) in Newtons."""
-    if mode == "step":
-        return T_max if t > 0.2 else 0.0
-    elif mode == "slow":
-        return np.clip(T_max * t / 1.0, 0.0, T_max)
-    elif mode == "fast":
-        return np.clip(T_max * t / 0.25, 0.0, T_max)
-    elif mode == "hoverd":
-        if t < 1.0:
-            return T_max
-        else:
-            return T_max * (0.6 + 0.2 * np.sin(2 * np.pi * (t - 1.0)))
-    elif mode == "pulses":
-        period = 0.8
-        phase = (t % period) / period
-        return T_max if phase < 0.4 else 0.2 * T_max
-    else:
-        return T_max
-
-
-# --------------------------------------------
-# Thrust → circulation scaling
-# --------------------------------------------
-
-def thrust_to_circulation(T, R, rho):
-    """
-    Simple actuator-disc style scaling:
-        T ~ ρ Γ^2 / (4πR)  =>  Γ ~ sqrt(T * 4πR / ρ)  (Kelvin-type scaling). [web:45]
-    """
-    T = max(T, 0.0)
-    return np.sqrt(T * 4.0 * np.pi * R / max(rho, 1e-9))
-
-
-# --------------------------------------------
-# Ring object with Γ and viscous decay
-# --------------------------------------------
-
-class VortexRingSimple:
-    """
-    Each ring carries:
-        Γ  : circulation [m^2/s]
-        R  : ring radius [m]
-        z  : vertical position [m]
-        a  : core radius / thickness [m]
-
-    Motion:
-        U = Γ / (4πR) (ln(8R/a) - 1/4)  (Kelvin–Helmholtz thin-ring formula). [web:34][web:36][web:38]
-    Decay:
-        dΓ/dt = -ν_eff * Γ / a^2  (viscous diffusion scaling). [web:40][web:43][web:46]
-    """
-
-    def __init__(self, R, z0, Gamma, nu_eff):
-        self.R = R
-        self.z = z0
-        self.Gamma = Gamma
-        self.a = 0.01        # initial core size [m]
-        self.nu_eff = nu_eff
-
-    def update(self, dt):
-        # grow core radius slowly (diffusive growth)
-        self.a = max(self.a, 1e-4)
-        self.a += np.sqrt(4 * self.nu_eff * dt) * 0.2
-
-        # viscous circulation decay
-        self.Gamma *= np.exp(-self.nu_eff * dt / (self.a**2 + 1e-9))
-
-        # self-induced speed
-        R = max(self.R, 1e-4)
-        a = max(self.a, 1e-4)
-        U = self.Gamma / (4.0 * np.pi * R) * (np.log(8.0 * R / a) - 0.25)  # m/s [web:34][web:36][web:38]
-
-        # move downward with U (z decreases as ring travels away)
-        self.z -= U * dt
-
-    def weaken_due_to_interaction(self, factor):
-        """Apply extra damping when rings get too close (simple interaction)."""
-        self.Gamma *= factor
+G = 9.81  # m/s^2 (for Reynolds scale display)
 
 
 # --------------------------------------------

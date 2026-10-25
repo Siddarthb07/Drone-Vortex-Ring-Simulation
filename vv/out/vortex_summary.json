@@ -1,0 +1,14 @@
+{
+  "helmholtz_U_rmse_m_s": 0.0,
+  "kelvin_T_invert_rmse_N": 3.637964423314456e-15,
+  "kelvin_T_invert_max_abs_pct": 3.9474596431116676e-14,
+  "frozen_core_decay_rmse_m2_s": 6.9443454229053744e-06,
+  "wake_step_final_total_gamma": 96.81516369676292,
+  "n_wake_samples": 101,
+  "assumptions": [
+    "Thin-ring Helmholtz self-induction; thick-core corrections omitted",
+    "Kelvin \u0393\u2013T scaling is actuator-disk inspired, not Navier\u2013Stokes",
+    "Ring\u2013ring interaction in the GUI is heuristic damping, not Biot\u2013Savart",
+    "Not a CFD solver; educational / reduced-order research software"
+  ]
+}

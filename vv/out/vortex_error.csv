@@ -1,0 +1,5 @@
+check,metric,value
+helmholtz_identity,rmse_m_s,0.0
+kelvin_invertibility,rmse_N,3.637964423314456e-15
+kelvin_invertibility,max_abs_pct,3.9474596431116676e-14
+frozen_core_decay,rmse_m2_s,6.9443454229053744e-06

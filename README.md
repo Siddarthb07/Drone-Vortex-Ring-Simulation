@@ -45,6 +45,14 @@ python vortex_rings_simulation.py
 - `numpy`
 - `matplotlib`
 
+## V&V / AIAA artifacts
+
+```bash
+python -m vv.bench_vortex
+```
+
+Headless physics lives in `vortex_physics.py`. Outputs: `vv/out/`. Assumptions: `docs/ASSUMPTIONS.md`.
+
 ## Limitations
 
 - This is an educational reduced-order model, not a CFD solver
